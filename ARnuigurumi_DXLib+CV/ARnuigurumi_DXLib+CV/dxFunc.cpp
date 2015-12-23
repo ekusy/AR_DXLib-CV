@@ -43,3 +43,4 @@ void dxFunc::createGraphHandle(){
 int dxFunc::getCVImage(){
 	return cvImage;
 }
+

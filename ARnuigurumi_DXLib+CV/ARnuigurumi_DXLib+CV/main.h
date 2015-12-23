@@ -6,6 +6,12 @@
 
 #include "cvFunc.h"
 #include "dxFunc.h"
+#include "Position.h"
+
+#include <iostream>
+#include <vector>
+#include <windows.h>
+#pragma comment(lib, "winmm.lib")
 class main
 {
 public:

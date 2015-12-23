@@ -11,7 +11,10 @@ main::~main()
 }
 
 static const float ROTATE_SPEED = DX_PI_F / 90;//回転スピード
-
+double map(double v, double sx, double sn, double dx, double dn)
+{
+	return (v - sn) * (dx - dn) / (sx - sn) + dn;
+}
 // (x,y)の点を(mx,my)を中心にang角回転する
 void rotate(float *x, float *y, const float ang, const float mx, const float my){
 	const float ox = *x - mx, oy = *y - my;
@@ -25,35 +28,63 @@ void rotate(float *x, float *y, const float ang, const float mx, const float my)
 		ChangeWindowMode(TRUE), DxLib_Init(), SetDrawScreen(DX_SCREEN_BACK);
 		cvFunc CV;
 		dxFunc DX;
-		float cameraX = 0, cameraZ = -20;    //カメラの座標
+		Position pos;
+		float cameraX = 0, cameraZ = 0;    //カメラの座標
 		const float targetX = 0, targetZ = 0;//カメラの視線の先ターゲットの座標
-
+		float x = 0.0, y = 0.0, z = 0.0;
 		//3Dモデルの読み込み
 		int ModelHandle = MV1LoadModel("./model/bokoboko.pmd");
 		//奥行0.1～1000までをカメラの描画範囲とする
 		SetCameraNearFar(0.1f, 1000.0f);
+		//第一引数の視点から第二引数のターゲットを見る角度にカメラを設置
+		SetCameraPositionAndTarget_UpVecY(VGet(cameraX, 5, cameraZ), VGet(cameraX, 5, cameraZ + 10));
+		
 
 		while (ProcessMessage() == 0){
-
+			// 画面に描かれているものを一回全部消す
+			ClearDrawScreen();
+			DWORD start = timeGetTime();       // スタート時間
 			CV.readCapture();
+			pos = CV.getPosition();
 			DX.setBaseImage(CV.getImageData());
 			DX.createGraphHandle();
+
 			// フレームの内容を画面に描画
 			DrawGraph(0, 0, DX.getCVImage(), FALSE);
 
 			if (CheckHitKey(KEY_INPUT_LEFT) > 0){//左キーが押されていたら
-				rotate(&cameraX, &cameraZ, +ROTATE_SPEED, targetX, targetZ);//回転
+				x--;
+				//rotate(&cameraX, &cameraZ, +ROTATE_SPEED, targetX, targetZ);//回転
 			}
 			if (CheckHitKey(KEY_INPUT_RIGHT) > 0){//右キーが押されていたら
-				rotate(&cameraX, &cameraZ, -ROTATE_SPEED, targetX, targetZ);//回転
+				x++;
+				//rotate(&cameraX, &cameraZ, -ROTATE_SPEED, targetX, targetZ);//回転
 			}
-
-			//第一引数の視点から第二引数のターゲットを見る角度にカメラを設置
-			SetCameraPositionAndTarget_UpVecY(VGet(cameraX, 10, cameraZ), VGet(targetX, 10.0f, targetZ));
-
+			if (CheckHitKey(KEY_INPUT_UP) > 0){//左キーが押されていたら
+				y++;
+				//rotate(&cameraX, &cameraZ, +ROTATE_SPEED, targetX, targetZ);//回転
+			}
+			if (CheckHitKey(KEY_INPUT_DOWN) > 0){//右キーが押されていたら
+				y--;
+				//rotate(&cameraX, &cameraZ, -ROTATE_SPEED, targetX, targetZ);//回転
+			}
+			if (pos.x != -1){
+				pos.x -= 320;
+				pos.fx = float(pos.x)/15.0;
+				//pos.x = map(float(pos.x), -320.0, 320.0, -15.0, 15.0);
+				pos.y -= 240;
+				pos.fy = float(pos.y) / 10.0;
+				//pos.y = map(float(pos.y), -240.0, 240.0, -10.0, 10.0);
+			}
+			//上下±10.0,左右±15.0
+			MV1SetPosition(ModelHandle, VGet(pos.fx, -pos.fy, 20.0f));
 			// ３Ｄモデルの描画
 			MV1DrawModel(ModelHandle);
 
+			//経過時間
+			DWORD end = timeGetTime();    // 終了時間
+			DrawFormatString(20, 20, GetColor(0, 0, 255), "time = %lf", (double)(end - start) / 1000);
+			DrawFormatString(20, 50, GetColor(0, 0, 255), "x = %lf : y = %lf",pos.fx,pos.fy);
 			// 裏画面の内容を表画面に反映
 			ScreenFlip();
 		}
