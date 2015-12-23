@@ -90,9 +90,15 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="cvFunc.h" />
+    <ClInclude Include="dxFunc.h" />
+    <ClInclude Include="IMAGE.h" />
     <ClInclude Include="main.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="cvFunc.cpp" />
+    <ClCompile Include="dxFunc.cpp" />
+    <ClCompile Include="IMAGE.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
