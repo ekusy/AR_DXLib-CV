@@ -3,7 +3,8 @@
 
 cvFunc::cvFunc()
 {
-	cap.open(0);
+	if (!cap.open(1))
+		cap.open(0);
 }
 
 
@@ -37,37 +38,68 @@ IMAGE cvFunc::getImageData(){
 	return IMG;
 }
 
-Position cvFunc::getPosition(){
+Position cvFunc::getPosition(bool _noiseFlg){
 	Position pos;
 	int count = 0;
 	int X = 0;
 	int Y = 0;
 	Mat mask(hsv.rows, hsv.cols, CV_8UC3);
-	for (int row = 0; row < hsv.rows; row++){
-		for (int col = 0; col < hsv.cols; col++){
-			int num = hsv.step*row + col*hsv.channels();
-			if ((hsv.data[num] > 160 || hsv.data[num] < 20) && hsv.data[num + 1] > 200 && hsv.data[num + 2] > 200){
-				//num = mask.step*row + col;
-				//mask.data[num] = 255;
-				frame.data[num] = 255;
-				frame.data[num + 1] = 0;
-				frame.data[num + 2] = 0;
+	mask = Scalar(0, 0, 0);
+	//Mat mask
+	if (_noiseFlg){
+		for (int row = 0; row < hsv.rows; row++){
+			for (int col = 0; col < hsv.cols; col++){
+				int num = hsv.step*row + col*hsv.channels();
+				if ((hsv.data[num] > 100 && hsv.data[num] < 110) && hsv.data[num + 1] > 130 && hsv.data[num + 2] > 130){
+					//num = mask.step*row + col;
+					//mask.data[num] = 255;
+					frame.data[num] = 255;
+					frame.data[num + 1] = 0;
+					frame.data[num + 2] = 0;
 
-				count++;
-				Y += row;
-				X += col;
-			}
-			else{
-				//num = mask.step*row + col;
-				//mask.data[num] = 100;
-				/*
-				frame.data[num] = 255;
-				frame.data[num + 1] = 255;
-				frame.data[num + 2] = 255;
-				*/
+					count++;
+					Y += row;
+					X += col;
+				}
+				else{
+					//num = mask.step*row + col;
+					//mask.data[num] = 100;
+					/*
+					frame.data[num] = 255;
+					frame.data[num + 1] = 255;
+					frame.data[num + 2] = 255;
+					*/
+				}
 			}
 		}
 	}
+	else{
+		for (int row = 0; row < hsv.rows; row++){
+			for (int col = 0; col < hsv.cols; col++){
+				int num = hsv.step*row + col*hsv.channels();
+				if ((hsv.data[num] > 100 && hsv.data[num] < 110) && hsv.data[num + 1] > 130 && hsv.data[num + 2] > 130){
+					mask.data[num] = 255;
+				}
+				else{
+					mask.data[num] = 0;
+				}
+			}
+		}
+		erode(mask, mask, Mat(), Point(-1, -1), 4);
+		dilate(mask, mask, Mat(), Point(-1, -1), 4);
+		for (int row = 0; row < hsv.rows; row++){
+			for (int col = 0; col < hsv.cols; col++){
+				int num = hsv.step*row + col*hsv.channels();
+				if (mask.data[num] == 255){
+					count++;
+					Y += row;
+					X += col;
+				}
+			}
+		}
+	}
+
+	
 	std::ostringstream oss;
 
 	if (count > 0){

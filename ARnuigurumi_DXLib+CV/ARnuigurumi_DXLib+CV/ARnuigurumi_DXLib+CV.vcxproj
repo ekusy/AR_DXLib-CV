@@ -40,7 +40,7 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros">
-    <NuGetPackageImportStamp>2c8ad18d</NuGetPackageImportStamp>
+    <NuGetPackageImportStamp>1432aab4</NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
@@ -87,9 +87,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="cvFunc.h" />
     <ClInclude Include="dxFunc.h" />
     <ClInclude Include="IMAGE.h" />
@@ -102,6 +99,9 @@
     <ClCompile Include="IMAGE.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Position.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

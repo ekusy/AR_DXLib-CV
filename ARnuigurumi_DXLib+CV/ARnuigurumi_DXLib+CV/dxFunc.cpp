@@ -12,6 +12,8 @@ dxFunc::dxFunc()
 	// ミップマップではないので０
 	BaseImage.MipMapCount = 0;
 	cvImage = -1;
+
+	ModelHandle = MV1LoadModel("./model/bokoboko.pmd");
 }
 
 
@@ -44,3 +46,23 @@ int dxFunc::getCVImage(){
 	return cvImage;
 }
 
+Position dxFunc::getScreenPos(int _modelHandle){
+	VECTOR pos;
+	Position p;
+	pos = ConvWorldPosToScreenPos(MV1GetPosition(_modelHandle));
+	p.fx = pos.x;
+	p.fy = pos.y;
+	return p;
+}
+
+Position dxFunc::setWorldPos(Position _pos){
+	VECTOR screen;
+	VECTOR world;
+	Position pos;
+	screen.x = double(_pos.x);
+	screen.y = double(_pos.y);
+	world = ConvScreenPosToWorldPos(screen);
+	pos.fx = world.x;
+	pos.fy = world.y;
+	return pos;
+}

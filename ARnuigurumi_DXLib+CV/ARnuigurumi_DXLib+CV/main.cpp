@@ -45,7 +45,7 @@ void rotate(float *x, float *y, const float ang, const float mx, const float my)
 			ClearDrawScreen();
 			DWORD start = timeGetTime();       // ƒXƒ^[ƒgŽžŠÔ
 			CV.readCapture();
-			pos = CV.getPosition();
+			pos = CV.getPosition(false);
 			DX.setBaseImage(CV.getImageData());
 			DX.createGraphHandle();
 
@@ -68,14 +68,25 @@ void rotate(float *x, float *y, const float ang, const float mx, const float my)
 				y--;
 				//rotate(&cameraX, &cameraZ, -ROTATE_SPEED, targetX, targetZ);//‰ñ“]
 			}
+			
 			if (pos.x != -1){
 				pos.x -= 320;
 				pos.fx = float(pos.x)/15.0;
+				if (pos.fx > 15.0)
+					pos.fx = 15.0;
+				if (pos.fx < -15.0)
+					pos.fx = -15.0;
 				//pos.x = map(float(pos.x), -320.0, 320.0, -15.0, 15.0);
 				pos.y -= 240;
 				pos.fy = float(pos.y) / 10.0;
+				if (pos.fy > 10.0)
+					pos.fy = 10.0;
+				if (pos.fy < -10.0)
+					pos.fy = -10.0;
 				//pos.y = map(float(pos.y), -240.0, 240.0, -10.0, 10.0);
 			}
+			
+			//pos = DX.setWorldPos(pos);
 			//ã‰º}10.0,¶‰E}15.0
 			MV1SetPosition(ModelHandle, VGet(pos.fx, -pos.fy, 20.0f));
 			// ‚R‚cƒ‚ƒfƒ‹‚Ì•`‰æ
@@ -83,8 +94,11 @@ void rotate(float *x, float *y, const float ang, const float mx, const float my)
 
 			//Œo‰ßŽžŠÔ
 			DWORD end = timeGetTime();    // I—¹ŽžŠÔ
-			DrawFormatString(20, 20, GetColor(0, 0, 255), "time = %lf", (double)(end - start) / 1000);
+			double time = (double)(end - start) / 1000;
+			DrawFormatString(20, 20, GetColor(0, 0, 255), "time = %lf,fps = %lf", time , 1/time);
 			DrawFormatString(20, 50, GetColor(0, 0, 255), "x = %lf : y = %lf",pos.fx,pos.fy);
+			//pos = DX.getScreenPos(ModelHandle);
+			DrawFormatString(20, 70, GetColor(0, 255, 255), "x = %lf : y = %lf", pos.fx, pos.fy);
 			// — ‰æ–Ê‚Ì“à—e‚ð•\‰æ–Ê‚É”½‰f
 			ScreenFlip();
 		}

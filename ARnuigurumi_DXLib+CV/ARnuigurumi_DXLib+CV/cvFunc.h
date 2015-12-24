@@ -18,7 +18,7 @@ public:
 	void setImage(Mat _source);
 	IplImage getFrameHandle(void);
 	IMAGE cvFunc::getImageData(void);
-	Position getPosition(void);
+	Position getPosition(bool noiseFlg);
 	bool hsvJudge(int color[3], int h, int h_field, int s, int s_field, int v, int v_field);
 };
 
