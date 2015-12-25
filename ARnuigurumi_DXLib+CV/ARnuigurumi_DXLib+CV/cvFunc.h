@@ -10,6 +10,7 @@ private:
 	Mat image;
 	Mat frame;
 	Mat hsv;
+	Position red, blue;
 public:
 	VideoCapture cap;
 	cvFunc();
@@ -17,8 +18,10 @@ public:
 	void readCapture(void);
 	void setImage(Mat _source);
 	IplImage getFrameHandle(void);
-	IMAGE cvFunc::getImageData(void);
+	IMAGE getImageData(void);
 	Position getPosition(bool noiseFlg);
-	bool hsvJudge(int color[3], int h, int h_field, int s, int s_field, int v, int v_field);
+	bool judge(int source, int min, int max);
+	bool judgeColor(int source[], int h_min, int h_max, int s_min, int s_max, int v_min, int v_max);
+	double getAngle(void);
 };
 

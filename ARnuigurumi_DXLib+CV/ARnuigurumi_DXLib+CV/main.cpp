@@ -39,6 +39,7 @@ void rotate(float *x, float *y, const float ang, const float mx, const float my)
 		//第一引数の視点から第二引数のターゲットを見る角度にカメラを設置
 		SetCameraPositionAndTarget_UpVecY(VGet(cameraX, 5, cameraZ), VGet(cameraX, 5, cameraZ + 10));
 		
+		int ang = 0;
 
 		while (ProcessMessage() == 0){
 			// 画面に描かれているものを一回全部消す
@@ -89,6 +90,9 @@ void rotate(float *x, float *y, const float ang, const float mx, const float my)
 			//pos = DX.setWorldPos(pos);
 			//上下±10.0,左右±15.0
 			MV1SetPosition(ModelHandle, VGet(pos.fx, -pos.fy, 20.0f));
+			MV1SetRotationXYZ(ModelHandle,VGet( 0.0,0.0,CV.getAngle()) );
+			//MV1SetRotationXYZ(ModelHandle, VGet(ang, 0.0, 0.0));
+			//MV1SetRotationXYZ(ModelHandle, VGet(rand(),rand(),rand()));
 			// ３Ｄモデルの描画
 			MV1DrawModel(ModelHandle);
 
@@ -99,8 +103,13 @@ void rotate(float *x, float *y, const float ang, const float mx, const float my)
 			DrawFormatString(20, 50, GetColor(0, 0, 255), "x = %lf : y = %lf",pos.fx,pos.fy);
 			//pos = DX.getScreenPos(ModelHandle);
 			DrawFormatString(20, 70, GetColor(0, 255, 255), "x = %lf : y = %lf", pos.fx, pos.fy);
+			DrawFormatString(20, 90, GetColor(255, 255, 0), "angle=%lf", (CV.getAngle()*180.0 / DX_PI));
 			// 裏画面の内容を表画面に反映
 			ScreenFlip();
+			ang++;
+			if (ang == 360){
+				ang = 0;
+			}
 		}
 
 		CV.cap.release();
