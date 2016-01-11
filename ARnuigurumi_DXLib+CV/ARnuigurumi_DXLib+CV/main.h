@@ -7,6 +7,7 @@
 #include "cvFunc.h"
 #include "dxFunc.h"
 #include "Position.h"
+#include "py.h"
 
 #include <iostream>
 #include <vector>

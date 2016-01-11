@@ -29,6 +29,7 @@ void rotate(float *x, float *y, const float ang, const float mx, const float my)
 		cvFunc CV;
 		dxFunc DX;
 		Position pos;
+		py PY;
 		float cameraX = 0, cameraZ = 0;    //カメラの座標
 		const float targetX = 0, targetZ = 0;//カメラの視線の先ターゲットの座標
 		float x = 0.0, y = 0.0, z = 0.0;
@@ -38,7 +39,7 @@ void rotate(float *x, float *y, const float ang, const float mx, const float my)
 		SetCameraNearFar(0.1f, 1000.0f);
 		//第一引数の視点から第二引数のターゲットを見る角度にカメラを設置
 		SetCameraPositionAndTarget_UpVecY(VGet(cameraX, 5, cameraZ), VGet(cameraX, 5, cameraZ + 10));
-		
+		PY.pySerialOpen();
 		float ang = 0,ang1=0.0;
 
 		while (ProcessMessage() == 0){
@@ -109,13 +110,19 @@ void rotate(float *x, float *y, const float ang, const float mx, const float my)
 			MV1SetPosition(ModelHandle, vPos);
 			MV1SetRotationXYZ(ModelHandle, VGet(ang, 0.0, ang1));
 			*/
+			char **rot = PY.pySerialRead();
+
+			DrawFormatString(0, 120, GetColor(255, 255, 255), "serialRead = %s,%s", rot[0], rot[1]);
+			char *str1 = rot[0],*str2=rot[1];
+			ang = atof(str1) * DX_PI_F / 180.0f;
+			ang1 = atof(str2)* DX_PI_F / 180.0f;
 			MV1SetPosition(ModelHandle, VGet(0.0,0.0, 20.0f));
-			MV1SetRotationXYZ(ModelHandle, VGet(ang, 0.0, ang1));
+			MV1SetRotationXYZ(ModelHandle, VGet(-ang, 0.0, -ang1));
 			//MV1SetRotationXYZ(ModelHandle,VGet( 0.0,0.0,CV.getAngle()) );
 			//MV1SetRotationXYZ(ModelHandle, VGet(rand(),rand(),rand()));
 			// ３Ｄモデルの描画
 			MV1DrawModel(ModelHandle);
-
+			
 			//経過時間
 			DWORD end = timeGetTime();    // 終了時間
 			double time = (double)(end - start) / 1000;
