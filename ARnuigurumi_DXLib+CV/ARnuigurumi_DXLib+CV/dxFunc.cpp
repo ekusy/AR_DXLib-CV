@@ -66,3 +66,14 @@ Position dxFunc::setWorldPos(Position _pos){
 	pos.fy = world.y;
 	return pos;
 }
+
+void dxFunc::modelRotateX(int _modelHandle,float _ang){
+	MV1SetPosition(_modelHandle, VGet(0.0, -5.0*cos(_ang), 20.0f - 5.0*sin(_ang)));
+	MV1SetRotationXYZ(_modelHandle, VGet(_ang, 0.0, 0.0));
+
+}
+
+void dxFunc::modelRotateZ(int _modelHandle, float _ang){
+	MV1SetPosition(_modelHandle, VGet(5.0*sin(_ang), -5.0*cos(_ang), 20.0));
+	MV1SetRotationXYZ(_modelHandle, VGet(0.0, 0.0, _ang));
+}

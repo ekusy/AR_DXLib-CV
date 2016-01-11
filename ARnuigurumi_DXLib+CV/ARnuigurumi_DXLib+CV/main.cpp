@@ -33,43 +33,49 @@ void rotate(float *x, float *y, const float ang, const float mx, const float my)
 		const float targetX = 0, targetZ = 0;//ƒJƒƒ‰‚Ì‹ü‚Ìæƒ^[ƒQƒbƒg‚ÌÀ•W
 		float x = 0.0, y = 0.0, z = 0.0;
 		//3Dƒ‚ƒfƒ‹‚Ì“Ç‚İ‚İ
-		int ModelHandle = MV1LoadModel("./model/bokoboko.pmd");
+		int ModelHandle = MV1LoadModel("./model/bokoboko.pmx");
 		//‰œs0.1`1000‚Ü‚Å‚ğƒJƒƒ‰‚Ì•`‰æ”ÍˆÍ‚Æ‚·‚é
 		SetCameraNearFar(0.1f, 1000.0f);
 		//‘æˆêˆø”‚Ì‹“_‚©‚ç‘æ“ñˆø”‚Ìƒ^[ƒQƒbƒg‚ğŒ©‚éŠp“x‚ÉƒJƒƒ‰‚ğİ’u
 		SetCameraPositionAndTarget_UpVecY(VGet(cameraX, 5, cameraZ), VGet(cameraX, 5, cameraZ + 10));
 		
-		int ang = 0;
+		float ang = 0,ang1=0.0;
 
 		while (ProcessMessage() == 0){
 			// ‰æ–Ê‚É•`‚©‚ê‚Ä‚¢‚é‚à‚Ì‚ğˆê‰ñ‘S•”Á‚·
 			ClearDrawScreen();
 			DWORD start = timeGetTime();       // ƒXƒ^[ƒgŠÔ
+			/*
 			CV.readCapture();
+			
 			pos = CV.getPosition(false);
 			DX.setBaseImage(CV.getImageData());
 			DX.createGraphHandle();
 
 			// ƒtƒŒ[ƒ€‚Ì“à—e‚ğ‰æ–Ê‚É•`‰æ
 			DrawGraph(0, 0, DX.getCVImage(), FALSE);
-
+			*/
 			if (CheckHitKey(KEY_INPUT_LEFT) > 0){//¶ƒL[‚ª‰Ÿ‚³‚ê‚Ä‚¢‚½‚ç
 				x--;
+				ang+=0.05;
 				//rotate(&cameraX, &cameraZ, +ROTATE_SPEED, targetX, targetZ);//‰ñ“]
 			}
 			if (CheckHitKey(KEY_INPUT_RIGHT) > 0){//‰EƒL[‚ª‰Ÿ‚³‚ê‚Ä‚¢‚½‚ç
 				x++;
+				ang -= 0.05;
 				//rotate(&cameraX, &cameraZ, -ROTATE_SPEED, targetX, targetZ);//‰ñ“]
 			}
 			if (CheckHitKey(KEY_INPUT_UP) > 0){//¶ƒL[‚ª‰Ÿ‚³‚ê‚Ä‚¢‚½‚ç
 				y++;
+				ang1 += 0.05;
 				//rotate(&cameraX, &cameraZ, +ROTATE_SPEED, targetX, targetZ);//‰ñ“]
 			}
 			if (CheckHitKey(KEY_INPUT_DOWN) > 0){//‰EƒL[‚ª‰Ÿ‚³‚ê‚Ä‚¢‚½‚ç
 				y--;
+				ang1 -= 0.05;
 				//rotate(&cameraX, &cameraZ, -ROTATE_SPEED, targetX, targetZ);//‰ñ“]
 			}
-			
+			/*
 			if (pos.x != -1){
 				pos.x -= 320;
 				pos.fx = float(pos.x)/15.0;
@@ -86,12 +92,26 @@ void rotate(float *x, float *y, const float ang, const float mx, const float my)
 					pos.fy = -10.0;
 				//pos.y = map(float(pos.y), -240.0, 240.0, -10.0, 10.0);
 			}
-			
+			*/
 			//pos = DX.setWorldPos(pos);
 			//ã‰º}10.0,¶‰E}15.0
-			MV1SetPosition(ModelHandle, VGet(pos.fx, -pos.fy, 20.0f));
-			MV1SetRotationXYZ(ModelHandle,VGet( 0.0,0.0,CV.getAngle()) );
-			//MV1SetRotationXYZ(ModelHandle, VGet(ang, 0.0, 0.0));
+			//MV1SetPosition(ModelHandle, VGet(pos.fx, -pos.fy, 20.0f));
+
+			//DX.modelRotateX(ModelHandle, ang);
+			//DX.modelRotateZ(ModelHandle, ang);
+			/*
+			VECTOR vPos = VGet(0.0, 0.0, 20.0f), vPos1 = VGet(0.0, -5.0*cos(ang), 5.0*sin(ang)), vPos2 = VGet(5.0*sin(ang1), 5.0*cos(ang1),0.0);
+			MATRIX mat1 = MGetTranslate(vPos1), mat2 = MGetTranslate(vPos2);
+			MATRIX mPos = MAdd(mat1, mat2);
+			vPos = VTransform(vPos, mPos);
+
+			DrawFormatString(20, 100, GetColor(255, 255, 255), "vPos[x]=%f,vPos[y]=%f,vPos[z]=%f", vPos.x, vPos.y, vPos.z);
+			MV1SetPosition(ModelHandle, vPos);
+			MV1SetRotationXYZ(ModelHandle, VGet(ang, 0.0, ang1));
+			*/
+			MV1SetPosition(ModelHandle, VGet(0.0,0.0, 20.0f));
+			MV1SetRotationXYZ(ModelHandle, VGet(ang, 0.0, ang1));
+			//MV1SetRotationXYZ(ModelHandle,VGet( 0.0,0.0,CV.getAngle()) );
 			//MV1SetRotationXYZ(ModelHandle, VGet(rand(),rand(),rand()));
 			// ‚R‚cƒ‚ƒfƒ‹‚Ì•`‰æ
 			MV1DrawModel(ModelHandle);
@@ -106,9 +126,16 @@ void rotate(float *x, float *y, const float ang, const float mx, const float my)
 			DrawFormatString(20, 90, GetColor(255, 255, 0), "angle=%lf", (CV.getAngle()*180.0 / DX_PI));
 			// — ‰æ–Ê‚Ì“à—e‚ğ•\‰æ–Ê‚É”½‰f
 			ScreenFlip();
-			ang++;
-			if (ang == 360){
+			//ang+=0.05;
+			//ang1 += 0.1;
+			if (ang > 360){
 				ang = 0;
+			}
+			if (ang1 > 360){
+				ang1 = 0;
+			}
+			if (CheckKeyInput(KEY_INPUT_ESCAPE) > 0){
+				break;
 			}
 		}
 
