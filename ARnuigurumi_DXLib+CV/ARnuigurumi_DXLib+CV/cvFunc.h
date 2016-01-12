@@ -15,7 +15,7 @@ public:
 	VideoCapture cap;
 	cvFunc();
 	~cvFunc();
-	void readCapture(void);
+	void readCapture(bool _showFlg);
 	void setImage(Mat _source);
 	IplImage getFrameHandle(void);
 	IMAGE getImageData(void);

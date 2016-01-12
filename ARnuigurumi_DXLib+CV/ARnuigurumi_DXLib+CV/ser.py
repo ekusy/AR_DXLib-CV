@@ -9,6 +9,7 @@ def serialOpen():
 
 def serialReadLine():
     #ser.open()
+    ser.flush()
     str = ser.readline().rstrip()
     #ser.close()
     #print(str)

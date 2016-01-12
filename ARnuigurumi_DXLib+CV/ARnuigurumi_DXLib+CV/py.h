@@ -1,8 +1,6 @@
 #pragma once
 #include <Python.h>
 #include <stdlib.h>
-#define TRUE 1
-#define FALSE -1
 class py
 {
 

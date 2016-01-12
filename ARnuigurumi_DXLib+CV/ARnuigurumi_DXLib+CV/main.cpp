@@ -37,6 +37,7 @@ void rotate(float *x, float *y, const float ang, const float mx, const float my)
 		int ModelHandle = MV1LoadModel("./model/bokoboko.pmx");
 		//奥行0.1～1000までをカメラの描画範囲とする
 		SetCameraNearFar(0.1f, 1000.0f);
+
 		//第一引数の視点から第二引数のターゲットを見る角度にカメラを設置
 		SetCameraPositionAndTarget_UpVecY(VGet(cameraX, 5, cameraZ), VGet(cameraX, 5, cameraZ + 10));
 		PY.pySerialOpen();
@@ -46,37 +47,23 @@ void rotate(float *x, float *y, const float ang, const float mx, const float my)
 			// 画面に描かれているものを一回全部消す
 			ClearDrawScreen();
 			DWORD start = timeGetTime();       // スタート時間
-			/*
-			CV.readCapture();
 			
+			CV.readCapture(true);
+			DX.setBaseImage(CV.getImageData());
+			DX.createGraphHandle();
+
+
+			// フレームの内容を画面に描画
+			DrawGraph(0, 0, DX.getCVImage(), FALSE);
+
 			pos = CV.getPosition(false);
 			DX.setBaseImage(CV.getImageData());
 			DX.createGraphHandle();
 
+
 			// フレームの内容を画面に描画
 			DrawGraph(0, 0, DX.getCVImage(), FALSE);
-			*/
-			if (CheckHitKey(KEY_INPUT_LEFT) > 0){//左キーが押されていたら
-				x--;
-				ang+=0.05;
-				//rotate(&cameraX, &cameraZ, +ROTATE_SPEED, targetX, targetZ);//回転
-			}
-			if (CheckHitKey(KEY_INPUT_RIGHT) > 0){//右キーが押されていたら
-				x++;
-				ang -= 0.05;
-				//rotate(&cameraX, &cameraZ, -ROTATE_SPEED, targetX, targetZ);//回転
-			}
-			if (CheckHitKey(KEY_INPUT_UP) > 0){//左キーが押されていたら
-				y++;
-				ang1 += 0.05;
-				//rotate(&cameraX, &cameraZ, +ROTATE_SPEED, targetX, targetZ);//回転
-			}
-			if (CheckHitKey(KEY_INPUT_DOWN) > 0){//右キーが押されていたら
-				y--;
-				ang1 -= 0.05;
-				//rotate(&cameraX, &cameraZ, -ROTATE_SPEED, targetX, targetZ);//回転
-			}
-			/*
+			
 			if (pos.x != -1){
 				pos.x -= 320;
 				pos.fx = float(pos.x)/15.0;
@@ -93,33 +80,24 @@ void rotate(float *x, float *y, const float ang, const float mx, const float my)
 					pos.fy = -10.0;
 				//pos.y = map(float(pos.y), -240.0, 240.0, -10.0, 10.0);
 			}
-			*/
+			
 			//pos = DX.setWorldPos(pos);
 			//上下±10.0,左右±15.0
 			//MV1SetPosition(ModelHandle, VGet(pos.fx, -pos.fy, 20.0f));
 
-			//DX.modelRotateX(ModelHandle, ang);
-			//DX.modelRotateZ(ModelHandle, ang);
-			/*
-			VECTOR vPos = VGet(0.0, 0.0, 20.0f), vPos1 = VGet(0.0, -5.0*cos(ang), 5.0*sin(ang)), vPos2 = VGet(5.0*sin(ang1), 5.0*cos(ang1),0.0);
-			MATRIX mat1 = MGetTranslate(vPos1), mat2 = MGetTranslate(vPos2);
-			MATRIX mPos = MAdd(mat1, mat2);
-			vPos = VTransform(vPos, mPos);
-
-			DrawFormatString(20, 100, GetColor(255, 255, 255), "vPos[x]=%f,vPos[y]=%f,vPos[z]=%f", vPos.x, vPos.y, vPos.z);
-			MV1SetPosition(ModelHandle, vPos);
-			MV1SetRotationXYZ(ModelHandle, VGet(ang, 0.0, ang1));
-			*/
 			char **rot = PY.pySerialRead();
-
+			
 			DrawFormatString(0, 120, GetColor(255, 255, 255), "serialRead = %s,%s", rot[0], rot[1]);
 			char *str1 = rot[0],*str2=rot[1];
-			ang = atof(str1) * DX_PI_F / 180.0f;
-			ang1 = atof(str2)* DX_PI_F / 180.0f;
-			MV1SetPosition(ModelHandle, VGet(0.0,0.0, 20.0f));
+			if (NULL == str1 || NULL == str2){
+			}
+			else{
+				ang = atof(str1) * DX_PI_F / 180.0f;
+				ang1 = atof(str2)* DX_PI_F / 180.0f;
+			}
+			MV1SetPosition(ModelHandle, VGet(pos.fx, -pos.fy+5.0, 20.0f));
 			MV1SetRotationXYZ(ModelHandle, VGet(-ang, 0.0, -ang1));
-			//MV1SetRotationXYZ(ModelHandle,VGet( 0.0,0.0,CV.getAngle()) );
-			//MV1SetRotationXYZ(ModelHandle, VGet(rand(),rand(),rand()));
+
 			// ３Ｄモデルの描画
 			MV1DrawModel(ModelHandle);
 			
