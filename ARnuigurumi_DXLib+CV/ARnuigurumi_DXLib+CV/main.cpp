@@ -43,12 +43,22 @@ void rotate(float *x, float *y, const float ang, const float mx, const float my)
 		PY.pySerialOpen();
 		float ang = 0,ang1=0.0;
 
+		DWORD trueTimeStart,trueTimeEnd;
+		DWORD falseTimeStart, falseTimeEnd;
+		double trueTimeAve = 0.0, trueTimeSum = 0.0;
+		double falseTimeAve = 0.0, falseTimeSum = 0.0;
+
+		bool isOpenFlg = false;
+		int trueCount = 0, falseCount = 0;
+
+
 		while (ProcessMessage() == 0){
+			isOpenFlg = false;
 			// 画面に描かれているものを一回全部消す
 			ClearDrawScreen();
 			DWORD start = timeGetTime();       // スタート時間
 			
-			CV.readCapture(true);
+			CV.readCapture(false);
 			DX.setBaseImage(CV.getImageData());
 			DX.createGraphHandle();
 
@@ -84,16 +94,24 @@ void rotate(float *x, float *y, const float ang, const float mx, const float my)
 			//pos = DX.setWorldPos(pos);
 			//上下±10.0,左右±15.0
 			//MV1SetPosition(ModelHandle, VGet(pos.fx, -pos.fy, 20.0f));
-
-			char **rot = PY.pySerialRead();
+			int isOpen = PY.pySerialIsOpen();
+			if (isOpen){
+				isOpenFlg = true;
+				int befAng[2] = { ang, ang1 };
 			
-			DrawFormatString(0, 120, GetColor(255, 255, 255), "serialRead = %s,%s", rot[0], rot[1]);
-			char *str1 = rot[0],*str2=rot[1];
-			if (NULL == str1 || NULL == str2){
+				int *rot = PY.pySerialRead(befAng);
+
+				DrawFormatString(0, 120, GetColor(255, 255, 255), "serialRead = %d,%d", rot[0], rot[1]);
+
+					ang = rot[0] * DX_PI_F / 180.0f;
+					ang1 = rot[1] * DX_PI_F / 180.0f;
+					if (ang == 0.0 && ang1 == 0.0){
+						ang = ang;
+					}
 			}
 			else{
-				ang = atof(str1) * DX_PI_F / 180.0f;
-				ang1 = atof(str2)* DX_PI_F / 180.0f;
+				ang = 0.0;
+				ang1 = 0.0;
 			}
 			MV1SetPosition(ModelHandle, VGet(pos.fx, -pos.fy+5.0, 20.0f));
 			MV1SetRotationXYZ(ModelHandle, VGet(-ang, 0.0, -ang1));
@@ -104,20 +122,35 @@ void rotate(float *x, float *y, const float ang, const float mx, const float my)
 			//経過時間
 			DWORD end = timeGetTime();    // 終了時間
 			double time = (double)(end - start) / 1000;
+
+			if (isOpenFlg){
+				trueTimeSum+=time;
+				trueCount++;
+				trueTimeAve = trueTimeSum / trueCount;
+			}
+			else{
+				falseTimeSum += time;
+				falseCount++;
+				falseTimeAve = falseTimeSum / falseCount;
+			}
+
 			DrawFormatString(20, 20, GetColor(0, 0, 255), "time = %lf,fps = %lf", time , 1/time);
 			DrawFormatString(20, 50, GetColor(0, 0, 255), "x = %lf : y = %lf",pos.fx,pos.fy);
 			//pos = DX.getScreenPos(ModelHandle);
 			DrawFormatString(20, 70, GetColor(0, 255, 255), "x = %lf : y = %lf", pos.fx, pos.fy);
 			DrawFormatString(20, 90, GetColor(255, 255, 0), "angle=%lf", (CV.getAngle()*180.0 / DX_PI));
+
+			DrawFormatString(20, 110, GetColor(0, 0, 255), "true  time = %lf,fps = %lf", trueTimeAve, 1 / trueTimeAve);
+			DrawFormatString(20, 130, GetColor(0, 0, 255), "false time = %lf,fps = %lf", falseTimeAve, 1 / falseTimeAve);
 			// 裏画面の内容を表画面に反映
 			ScreenFlip();
 			//ang+=0.05;
 			//ang1 += 0.1;
 			if (ang > 360){
-				ang = 0;
+				//ang = 0;
 			}
 			if (ang1 > 360){
-				ang1 = 0;
+				//ang1 = 0;
 			}
 			if (CheckKeyInput(KEY_INPUT_ESCAPE) > 0){
 				break;

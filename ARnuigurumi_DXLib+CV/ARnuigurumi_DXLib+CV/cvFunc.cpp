@@ -40,43 +40,43 @@ IMAGE cvFunc::getImageData(){
 
 Position cvFunc::getPosition(bool _noiseFlg){
 	Position pos;
-	int countB = 0, countR = 0;
+	int count = 0;
 	int X = 0;
 	int Y = 0;
 	Mat mask(hsv.rows, hsv.cols, CV_8UC3);
 	mask = Scalar(0, 0, 0);
 	//Mat mask
 
-	blue.x = blue.y = red.x = red.y = 0;
 
-	if (_noiseFlg){
-		for (int row = 0; row < hsv.rows; row++){
-			for (int col = 0; col < hsv.cols; col++){
-				int num = hsv.step*row + col*hsv.channels();
-				int color[] = { hsv.data[num], hsv.data[num + 1], hsv.data[num + 2] };
-				if (judgeColor(color, 0, 10, 130, 255, 100, 140)){
-					//num = mask.step*row + col;
-					//mask.data[num] = 255;
-					frame.data[num] = 255;
-					frame.data[num + 1] = 0;
-					frame.data[num + 2] = 0;
+	
+	for (int row = 0; row < hsv.rows; row++){
+		for (int col = 0; col < hsv.cols; col++){
+			int num = hsv.step*row + col*hsv.channels();
+			int color[] = { hsv.data[num], hsv.data[num + 1], hsv.data[num + 2] };
+			if (judgeColor(color, 100, 110, 130, 255, 100, 255)){
+				//num = mask.step*row + col;
+				//mask.data[num] = 255;
+				frame.data[num] = 255;
+				frame.data[num + 1] = 0;
+				frame.data[num + 2] = 0;
 
-					countR++;
-					Y += row;
-					X += col;
-				}
-				else{
-					//num = mask.step*row + col;
-					//mask.data[num] = 100;
-
-					frame.data[num] = 255;
-					frame.data[num + 1] = 255;
-					frame.data[num + 2] = 255;
-
-				}
+				count++;
+				Y += row;
+				X += col;
+			}
+			else{
+				//num = mask.step*row + col;
+				//mask.data[num] = 100;
+				
+				//frame.data[num] = 255;
+				//frame.data[num + 1] = 255;
+				//frame.data[num + 2] = 255;
+				
 			}
 		}
 	}
+	
+	/*
 	else{
 		for (int row = 0; row < hsv.rows; row++){
 			for (int col = 0; col < hsv.cols; col++){
@@ -114,20 +114,20 @@ Position cvFunc::getPosition(bool _noiseFlg){
 		}
 	}
 
+	*/
 
-
-	if (countR > 20){
-		red.x /= countR;
-		red.y /= countR;
+	if (count > 20){
+		X /= count;
+		Y /= count;
 	}
 	image = frame;
-	if (countR <= 20){ //|| countB <= 20){
-		pos.x = -1;
-		pos.y = -1;
+	if (count <= 20){ //|| countB <= 20){
+		X = -1;
+		Y = -1;
 	}
 	else{
-		pos.x = red.x;
-		pos.y = red.y;
+		pos.x = X;
+		pos.y = Y;
 	}
 	return pos;
 }

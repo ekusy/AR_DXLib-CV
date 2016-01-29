@@ -34,14 +34,24 @@ bool py::pySerialOpen(const char* _PORT,const int _BOARDRATE){
 	return _PyInt_AsInt(result);
 }
 
-char** py::pySerialRead(){
+int* py::pySerialRead(int *_ang){
 	PyObject *rec;
 	rec = PyObject_CallObject(pFunc2, NULL);
 	char* str = PyString_AsString(rec);
-	char *rot[2] = { "", "" };
-	rot[0] = strtok(str, ",");
-	rot[1] = strtok(NULL, ",");
-	return rot;
+	int ang[2];
+	int check = strcmp(str, "error");
+	if (check==0){
+		 return _ang;
+	}
+	else{
+		char *rot[2];
+		rot[0] = strtok(str, ",");
+		rot[1] = strtok(NULL, ",");
+		ang[0] = atoi(rot[0]);
+		ang[1] = atoi(rot[1]);
+		return ang;
+	}
+	
 
 }
 
@@ -52,7 +62,11 @@ void py::pySerialClose(){
 bool py::pySerialIsOpen(){
 	PyObject *rec;
 	rec = PyObject_CallObject(pFunc4, NULL);
-	return _PyInt_AsInt(rec);
+	int is = _PyInt_AsInt(rec);
+	if (is == 1)
+		return true;
+	else
+		return false;
 }
 
 

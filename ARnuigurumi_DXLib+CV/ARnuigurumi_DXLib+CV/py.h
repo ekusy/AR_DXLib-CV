@@ -13,7 +13,7 @@ public:
 	void pyFinalize(void);
 	bool pySerialOpen();
 	bool pySerialOpen(const char* _PORT,const int _BAUDRATE);
-	char** pySerialRead(void);
+	int* pySerialRead(int *_ang);
 	void pySerialClose(void);
 	bool pySerialIsOpen(void);
 };
